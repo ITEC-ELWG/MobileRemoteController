@@ -1,0 +1,9 @@
+{
+  "name": "MobileRemoteController",
+  "version": "0.0.1",
+  "description": "A remote controller for mobile controlling desktop website",
+  "dependencies": {
+    "express": "^4.13.3",
+    "socket.io": "^1.3.7"
+  }
+}
