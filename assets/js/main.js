@@ -66,9 +66,10 @@
         }
 
         function initMasterProtocal(viewer, socket) {
+            var EVENT_MASTER_COMMAND = 'MASTER_COMMAND';
             // 同步OSD移动和缩放数据，在动画结束时触发
             viewer.addHandler('animation-finish', function(e) {
-                socket.emit('MASTER_COMMAND', {
+                socket.emit(EVENT_MASTER_COMMAND, {
                     command: 'viewport-change',
                     center: viewport.getCenter(),
                     zoom: viewport.getZoom()
@@ -77,17 +78,26 @@
 
             // 同步OSD切换页面数据，在打开成功时触发
             viewer.addHandler('open', function(e) {
-                socket.emit('MASTER_COMMAND', {
+                socket.emit(EVENT_MASTER_COMMAND, {
                     command: 'page-change',
                     page: viewer.currentPage()
                 });
-
                 // HACK: OpenSeadragon的缩略图有一个textarea元素，在手机端点击总会弹出屏幕键盘，因此需要把它禁用掉
                 $('.openseadragon-container textarea').attr('disabled', 'disabled');
             });
 
             viewer.addHandler('canvas-click', function(e) {
-                console.log(e.position);
+                // e.quick表明了是否为点击，OSD中拖动也会触发canvas-click事件，只是e.quick为false
+                if (!e.quick) {
+                    return;
+                }
+                var viewportPos = viewport.windowToViewportCoordinates(e.position);
+                var $pin = createPin();
+                createPinOverlay($pin[0], viewportPos);
+                socket.emit(EVENT_MASTER_COMMAND, {
+                    command: 'pin',
+                    position: viewportPos
+                });
             });
         }
 
@@ -95,7 +105,6 @@
             socket.on('FORWARD_MASTER_COMMAND', function(data) {
                 executeCommand(data);
             });
-            // console.log(e, viewer.viewport.getCenter());
         }
 
         function executeCommand(data) {
@@ -108,9 +117,25 @@
                 case 'page-change':
                     viewer.goToPage(data.page);
                     break;
+                case 'pin':
+                    var $pin = createPin();
+                    createPinOverlay($pin[0], data.position);
+                    break;
                 default:
                     break;
             }
+        }
+
+        function createPin() {
+            var $pin = $('<div class="pin-hint hatch"></div>').appendTo($('.main'));
+            $pin.delay(2000).queue(function() {
+                $(this).addClass('pulse');
+            });
+            return $pin;
+        }
+
+        function createPinOverlay(pin, pos) {
+            viewer.addOverlay(pin, pos, OpenSeadragon.OverlayPlacement.TOP_LEFT);
         }
     });
 })();
