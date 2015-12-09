@@ -14,9 +14,20 @@ app.get('/', function (req, res) {
 
 
 var io = require('socket.io')(server);
+var slaveSocket;
+
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
+    console.log('Socket ID:', socket.id);
+    socket.on('SLAVE_AUTH', function(data) {
+        slaveSocket = socket;
+    });
+
+  // socket.emit('news', { hello: 'world' });
+  socket.on('MASTER_COMMAND', function (data) {
+    // console.log(data);
+    if (slaveSocket != null) {
+        console.log('Send to slave socket:', slaveSocket.id, data);
+        slaveSocket.emit('FORWARD_MASTER_COMMAND', data);
+    }
   });
 });
