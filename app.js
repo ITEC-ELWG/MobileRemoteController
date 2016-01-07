@@ -19,12 +19,11 @@ var slaveSocket;
 io.on('connection', function (socket) {
     console.log('Socket ID:', socket.id);
     socket.on('SLAVE_AUTH', function(data) {
+        // 记录从端的socket id，后续的控制指令均向此id推送
         slaveSocket = socket;
     });
 
-  // socket.emit('news', { hello: 'world' });
   socket.on('MASTER_COMMAND', function (data) {
-    // console.log(data);
     if (slaveSocket != null) {
         console.log('Send to slave socket:', slaveSocket.id, data);
         slaveSocket.emit('FORWARD_MASTER_COMMAND', data);

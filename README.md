@@ -13,7 +13,7 @@ npm install
 1. 然后用`node app`启动服务器，默认端口号为3000。
 2. 查看测试服务器的IP地址（用cmd输入`ipconfig`查看），假设你电脑的IP地址是`192.168.95.1`，修改`assets/js/main.js`的第9行`SOCKET_URL`变量的IP地址。
 3. 从端在PC浏览器上输入`http://localhost:3000`访问。
-4. 主控端打开手机浏览器（推荐Chrome），输入`http://192.168.95.1:3000#master`访问。实际地址视具体IP地址而定。如果部署到线上并绑定了域名，就可以省略查IP这一步。
+4. 主控端**确保连上的WIFI的IP与服务器在同一个网段**，打开手机浏览器（推荐Chrome），输入`http://192.168.95.1:3000#master`访问。实际地址视具体IP地址而定。如果部署到线上并绑定了域名，就可以省略查IP这一步。
 5. 手机上可以拖拽、缩放图片，切换显示的图片，点图片的位置可以生成一个红色的标记。
 
 ## How it works
@@ -49,6 +49,7 @@ MobileRemoteController在前端使用OpenSeadragon（以下简称OSD）来做图
 }
 ```
 
+从端连接到Node.js服务器后，服务器会记录下从端的socket id。服务器接受到主控端的控制数据后，向socket id推送`FORWARD_MASTER_COMMAND`事件，数据原样转发。从端收到`FORWARD_MASTER_COMMAND`事件后，解析具体的指令并调用OSD的API来还原操作，实现遥控。
 
 # Licence
 

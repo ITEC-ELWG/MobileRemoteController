@@ -19,11 +19,6 @@
             initSlaveProtocal(viewer, socket);
         }
 
-        socket.on('MID_MASTER_COMMAND', function(data) {
-            console.log(data);
-            executeCommand(data);
-        });
-
         function initOpenSeadragon(imageUrls, isMaster) {
             var tileSources = $.map(imageUrls, function(url, i) {
                 return {
