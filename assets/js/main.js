@@ -41,7 +41,7 @@
                 sequenceMode: true,
                 showReferenceStrip: isMaster,
 
-                visibilityRatio: 0.8,
+                visibilityRatio: 0.5,
                 blendTime: 0.5,
                 animationTime: 0.6,
                 // 最大缩放比例，大于1可失真放大
@@ -112,7 +112,7 @@
             switch (data.command) {
                 case 'viewport-change':
                     viewport.panTo(data.center);
-                    viewport.zoomTo(data.zoom);
+                    viewport.zoomTo(Math.min(data.zoom, viewport.getMaxZoom()));
                     break;
                 case 'page-change':
                     viewer.goToPage(data.page);
